@@ -16,7 +16,6 @@ index.html
 css/style.css
 js/script.js
 images/
-music/
 ```
 
 ## How to use
