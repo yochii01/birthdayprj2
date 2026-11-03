@@ -386,7 +386,7 @@ const friends = [
     messages: [
       "Happy birthday, Irvann (●'◡'●)",
       "aku buat web ini dan temen-temen juga ikut membantu",
-      "mungkin tidak seberapa tapi semoga kamu suka yaa",
+      "semoga kamu suka yaa",
     ]
   },
   {
@@ -402,7 +402,8 @@ const friends = [
     name: "Nana",
     messages: [
       "Selamat hepi birthday irpang,",
-      "ak tunggu kadonya :p"
+      "aku tunggu kadonya :p",
+      { sticker: "images/Gift_nana.jpg" }
     ]
   },
   {
