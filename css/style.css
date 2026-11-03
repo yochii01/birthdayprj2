@@ -1,0 +1,1123 @@
+/* ============ FONTS ============
+   "Golden Hopes" is NOT on Google Fonts, so you load the file yourself:
+   put GoldenHopes.ttf (or .otf) inside the "fonts" folder.
+   If the file is missing, the page uses "Mrs Saint Delafield" instead.
+   "Yuji Syuku" loads automatically from Google Fonts. */
+@font-face {
+  font-family: "Golden Hopes";
+  src: url("fonts/GoldenHopes.ttf") format("truetype"),
+       url("fonts/GoldenHopes.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============ SETTINGS (change these easily) ============ */
+:root {
+  --bg-image: url("../images/bustup.png");  /* your anime photo */
+  --bg-opacity: 0.73;                    /* 73% */
+  --title-font: "Golden Hopes", "Mrs Saint Delafield", cursive;
+  --jp-font: "Yuji Syuku", "Shippori Mincho", serif;
+  --panel-bg: rgba(255, 255, 255, .34);
+}
+
+
+/* ============ AUTOMATIC LIGHTING FILTERS ============ */
+#bg {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-image) center / cover no-repeat;
+  opacity: var(--bg-opacity, 0.73);
+  /* Ensure the background layout container allows overlay layers inside it */
+  position: relative; 
+}
+
+/* 🌟 THE AUTOMATIC TINT FILTER: Sits right on top of your photo */
+#bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: multiply; /* Blends colors organically into your artwork texture */
+  opacity: 0;
+  transition: opacity 1s ease, background 1s ease;
+  pointer-events: none;
+}
+
+/* 🌅 SUNSET LIGHTING: Drops a warm golden hour sunset glow filter automatically */
+body.sunset-mode #bg::after {
+  opacity: 0.85;
+  background: linear-gradient(135deg, rgba(255, 129, 45, 0.5), rgba(121, 35, 140, 0.39));
+}
+
+body.sunset-mode {
+  --panel-bg: rgba(255, 255, 255, 0.178);
+  --text-color: #fff;
+}
+
+/* 🌙 NIGHTTIME LIGHTING: Drops a deep twilight night shadow filter automatically */
+body.night-mode #bg::after {
+  opacity: 0.9;
+  background: linear-gradient(to bottom, rgba(26, 35, 82, 0.699), rgba(8, 8, 12, 0.459));
+}
+
+body.night-mode {
+  --panel-bg: rgba(255, 255, 255, 0.178);
+  --text-color: #fff;
+}
+
+/* Connect panels smoothly to the time shifts */
+#player, .theme-panel {
+  background: var(--panel-bg, rgba(255, 255, 255, .34)) !important;
+  color: var(--text-color, #111) !important;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+.theme-head { color: var(--text-color, #111) !important; }
+
+
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #17171a;
+  font-family: var(--jp-font);
+}
+
+/* ============ BACKGROUND PHOTO + RISE EFFECT ============ */
+#bg {
+  position: fixed;
+  background-position: center -50px;
+  inset: 0;
+  background: var(--bg-image) center / cover no-repeat;
+  opacity: 0;
+  transform: translateY(9%) scale(0);
+  will-change: transform, rotate, translate, opacity;
+  backface-visibility: hidden;
+}
+body.go #bg {
+  animation:
+    photoRise 2.4s cubic-bezier(.2, .7, .2, 1) forwards,
+    slowZoom  100s linear 2.4s forwards,
+    photoSway 6s ease-in-out 2.4s infinite backwards;
+}
+
+@keyframes photoRise {
+  from { opacity: 0;                 transform: translateY(9%) scale(1.14); }
+  to   { opacity: var(--bg-opacity); transform: translateY(0)  scale(1.06); }
+}
+
+@keyframes slowZoom {
+  from { transform: translateY(0) scale(1.06); }
+  to   { transform: translateY(0) scale(1.14); }
+}
+
+@keyframes photoSway {
+  0%, 100% { rotate: -0.6deg; translate: -1.2% 0; }
+  50%      { rotate:  0.6deg; translate:  1.2% 0; }
+}
+
+#shade {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.35) 100%);
+  pointer-events: none;
+}
+
+#snow {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ============ HAPPY BIRTHDAY TITLE ============ */
+#title {
+  position: fixed;
+  top: 9%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  font-family: var(--title-font);
+  font-weight: 400;
+  font-size: clamp(48px, 8vw, 130px);
+  line-height: 1;
+  color: #fff;
+  white-space: nowrap;
+  text-shadow: 0 2px 18px rgba(0,0,0,.35);
+  pointer-events: none;
+}
+#title .word { display: inline-block; margin: 0 .12em; }
+#title .letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(.5em);
+  filter: blur(14px);
+}
+body.go #title .letter {
+  animation: clarify 1.1s cubic-bezier(.2, .8, .2, 1) forwards;
+  animation-delay: calc(1.2s + var(--i) * 0.09s);
+}
+@keyframes clarify {
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* ============ PLAYER ============ */
+#player {
+  position: fixed;
+  left: 50%;
+  bottom: 5%;
+  transform: translate(-50%, 40px);
+  width: calc(100vw - 40px);
+  min-width: 0;
+  border-radius: 0;
+  padding: clamp(10px, 1.2vw, 18px) clamp(12px, 1.4vw, 20px);
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.4vw, 20px);
+  border-radius: clamp(20px, 2.6vw, 38px);
+  background: rgba(255, 255, 255, .34);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0,0,0,.25);
+  opacity: 0;
+}
+body.go #player {
+  animation: playerIn 1.2s ease 2.6s forwards;
+}
+@keyframes playerIn {
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ---- Spinning CD ---- */
+#cd {
+  flex: 0 0 auto;
+  width: clamp(48px, 6.4vw, 88px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid #111;
+  background:
+    radial-gradient(circle, #111 0 36%, transparent 37%),
+    repeating-radial-gradient(circle, #1b1b1b 0 2px, #2c2c2c 2px 3px);
+  box-shadow: 0 4px 14px rgba(0,0,0,.45);
+  display: grid;
+  place-items: center;
+  animation: spin 5s linear infinite;
+  animation-play-state: paused;
+}
+#cd.playing { animation-play-state: running; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.cd-label {
+  width: 38%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #d9161f;
+  border: 3px solid #0d0d0d;
+  box-shadow: inset 0 0 0 3px #1a1a1a;
+  display: grid;
+  place-items: center;
+}
+.cd-hole {
+  width: 22%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #f4d9d9;
+}
+
+/* ---- Title + controls ---- */
+.info { flex: 1; min-width: 0; }
+
+#trackTitle {
+  font-family: var(--jp-font);
+  font-size: clamp(10px, 1vw, 15px);
+  color: #111;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: clamp(6px, 1vw, 12px);
+}
+
+/* ---- button pill (no more seeking here) ---- */
+
+.info { 
+  flex: 1; 
+  min-width: 0; 
+  display: flex; 
+  flex-direction: 
+  column; 
+  gap: 6px; 
+}
+
+
+#btnBox {
+  position: relative;
+  align-self: center;   /* centers just this row, title/seek bar stay full-width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2.2vw, 32px);
+  padding: clamp(5px, .8vw, 10px) clamp(16px, 2vw, 26px);
+
+}
+
+#btnBox button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  width: clamp(18px, 1.8vw, 26px);
+  height: clamp(18px, 1.8vw, 26px);
+  display: grid;
+  place-items: center;
+  color: #111;
+  transition: transform .15s ease, opacity .15s ease;
+}
+#btnBox button:hover { transform: scale(1.15); }
+#btnBox button:active { transform: scale(.92); }
+
+/* ---- separate seek bar, only this part scrubs the song ---- */
+#seekBar {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: clamp(5px, .8vw, 10px) clamp(16px, 2vw, 26px);
+  height: 4px;
+  background: rgba(255, 255, 255, .5);
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 8px;
+}
+#progress {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: #c4202b;
+  pointer-events: none;
+}
+
+#btnBox svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#btnBox svg.fill { fill: currentColor; stroke: currentColor; stroke-width: 1; }
+#btnBox .fillpath { fill: currentColor; stroke: none; }
+
+/* shuffle / repeat look dim until turned on */
+#shuffle, #repeat { opacity: .55; }
+#shuffle.active, #repeat.active { opacity: 1; color: #d9161f; }
+
+/* ============ START SCREEN ============ */
+#gate {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 15, 18, .88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: opacity .8s ease, visibility .8s ease;
+}
+#gate.hide { opacity: 0; visibility: hidden; }
+
+#startBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background: none;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--jp-font);
+  font-size: 20px;
+  letter-spacing: .1em;
+}
+#startBtn .gift { font-size: 64px; animation: bounce 1.4s ease-in-out infinite; }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+/* ============ PHONE ============ */
+@media (max-width: 640px) {
+  #player { width: 92vw; bottom: 5%; }
+  #title { top: 14%; font-size: clamp(54px, 17vw, 100px); }
+  #title .word { display: block; margin: 0; }
+  #dateLine { top: calc(14% + 190px); font-size: clamp(13px, 3.2vw, 18px); }
+}
+
+/* ===== CINEMATIC BARS ===== */
+.bar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #000;
+  z-index: 40;
+  pointer-events: none;
+}
+.bar.top    { top: 0; }
+.bar.bottom { bottom: 0; }
+
+body.go .bar {
+  animation: barsOpen 2.4s cubic-bezier(.7, 0, .2, 1) .3s forwards;
+}
+@keyframes barsOpen {
+  to { height: 0; }
+}
+
+/* ===== FILM GRAIN ===== */
+#grain {
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.5'/></svg>");
+  opacity: .04;
+  pointer-events: none;
+  animation: grain 1s steps(6) infinite;
+}
+@keyframes grain {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-5%, 4%); }
+  40%  { transform: translate(4%, -6%); }
+  60%  { transform: translate(-3%, 7%); }
+  80%  { transform: translate(6%, -2%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ===== BEAT REACTION ===== */
+:root { --beat: 0; --sx: 0px; --sy: 0px; }
+
+#bg {
+  scale: 1.06;
+  rotate: calc(var(--sway, 0) * 0.8deg);
+  translate: calc(var(--sway, 0) * 1.2%) 0;
+}
+
+#title {
+  text-shadow:
+    0 0 calc(6px  + var(--beat) * 8px)  rgba(255,255,255,.9),
+    0 0 calc(18px + var(--beat) * 24px) rgba(255,255,255,.6),
+    0 0 calc(40px + var(--beat) * 40px) rgba(255,210,235,.5);
+}
+
+/* ============ ICONS + MESSAGE BUBBLES ============ */
+:root { --ic: clamp(36px, 3.6vw, 52px); }
+
+#sidebar {
+  width: clamp(180px, 40vw, 300px);
+  position: fixed;
+  left: clamp(18px, 5.5vw, 44px);
+  top: 11%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vw, 22px);
+  overflow-y: auto;
+  padding: 10px 10px 10px 20px;
+  bottom: 30%;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .05);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, .35) transparent;
+  opacity: 0;
+  transform: translateX(-30px);
+  
+}
+
+body.go #sidebar {
+  animation: sbIn .9s cubic-bezier(.2, .8, .2, 1) 2.9s forwards;
+}
+@keyframes sbIn { to { opacity: 1; transform: none; } }
+#sidebar::-webkit-scrollbar { width: 5px; }
+#sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .35); border-radius: 3px; }
+
+
+.contact {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* ---- the round icon ---- */
+.ic {
+  position: relative;
+  flex: none;
+  width: var(--ic);
+  height: var(--ic);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .75);
+  background: #cfd6e2 center / cover no-repeat;
+  font-size: calc(var(--ic) * .48);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+  filter: brightness(.88);
+  opacity: 0;
+  transform: scale(.4);
+  transition: scale .2s ease, box-shadow .25s ease, filter .25s ease, background-color .25s ease;
+}
+body.go .ic {
+  animation: icPop .6s cubic-bezier(.2, 1.4, .4, 1) forwards;
+  animation-delay: calc(3s + var(--n) * .15s);
+}
+@keyframes icPop { to { opacity: 1; transform: scale(1); } }
+
+.ic:hover  { scale: 1.1; filter: brightness(1); }
+.ic.active {
+  scale: 1.08;
+  filter: brightness(1);
+  background-color: #f6f8fb;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .35), 0 0 20px rgba(255, 255, 255, .75);
+}
+
+/* red number on the icon */
+.dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #ed4245;
+  color: #fff;
+  font: 700 11px/18px system-ui, sans-serif;
+  text-align: center;
+  box-shadow: 0 0 0 2px rgba(20, 20, 26, .8);
+}
+
+/* ---- the chat box next to the icon ---- */
+.bubbles {
+  position: relative;
+  width: clamp(190px, 20vw, 330px);
+  max-height: min(50vh, 300px);
+  padding: 10px 12px 14px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  opacity: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  transition: height .4s cubic-bezier(.2, .8, .2, 1);
+}
+
+.bubbles::-webkit-scrollbar { display: none; }
+body.go .bubbles {
+  animation: fadeIn .6s ease forwards;
+  animation-delay: calc(3.5s + var(--n) * .15s);
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* ---- a white message bubble ---- */
+.bubble {
+  max-width: 100%;
+  padding: 9px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .94);
+  color: #1b1b1f;
+  font: 500 clamp(12px, 1vw, 14.5px)/1.45 system-ui, "Segoe UI", "Noto Sans JP", sans-serif;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+  overflow-wrap: anywhere;
+  animation: bubbleIn .35s cubic-bezier(.2, 1.2, .4, 1) both;
+}
+
+.bubble:first-child { border-top-left-radius: 4px; }
+.bubble.instant { animation: none; }
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateX(-12px) scale(.9); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---- the "typing..." bubble ---- */
+.bubble.typing { display: flex; gap: 4px; padding: 12px 14px; }
+.bubble.typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9a9ca5;
+  animation: tdot .9s ease-in-out infinite;
+}
+.bubble.typing i:nth-child(2) { animation-delay: .15s; }
+.bubble.typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes tdot {
+  0%, 60%, 100% { transform: translateY(0);    opacity: .5; }
+  30%           { transform: translateY(-4px); opacity: 1;  }
+}
+
+/* ---- phone ---- */
+@media (max-width: 640px) {
+  :root { --ic: 40px; }
+  #sidebar { top: 40%; left: 12px; gap: 10px;}
+  #sidebar {width: 90%; height: min(24vh, 220px);}
+  .bubbles { width: calc(100vw - var(--ic) - 44px); max-height: 20vh; }
+}
+
+
+/* ============ PLAYLIST (right side) ============ */
+#playlist {
+  position: fixed;
+  top: 11%;
+  right: clamp(14px, 2.6vw, 44px);
+  z-index: 20;
+  width: clamp(190px, 17vw, 290px);
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .28);
+  opacity: 0;
+  transform: translateX(30px);
+}
+body.go #playlist {
+  animation: plIn .9s cubic-bezier(.2, .8, .2, 1) 3.4s forwards;
+}
+@keyframes plIn { to { opacity: 1; transform: none; } }
+
+/* dark header */
+.pl-head {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(45, 45, 50, .92);
+  color: #fff;
+  font: 500 clamp(12px, 1.1vw, 15px)/1.2 var(--jp-font);
+  letter-spacing: .14em;
+  text-align: center;
+  cursor: pointer;
+}
+.pl-head::after {
+  content: "▾";
+  display: inline-block;
+  margin-left: 8px;
+  font-size: .85em;
+  transition: transform .3s ease;
+}
+#playlist.collapsed .pl-head::after { transform: rotate(90deg); }
+
+/* list */
+.pl-list {
+  position: relative;
+  margin-top: 8px;
+  padding: 8px;
+  max-height: min(30vh, 260px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .55);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(60, 60, 70, .4) transparent;
+  transition: max-height .35s ease, margin .35s ease, padding .35s ease, opacity .25s ease;
+}
+#playlist.collapsed .pl-list {
+  max-height: 0;
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+/* one song */
+.song {
+  flex: none;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(88, 90, 102, .92);
+  color: #fff;
+  font: 500 clamp(10px, .95vw, 13.5px)/1.5 var(--jp-font);
+  letter-spacing: .04em;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color .2s ease, transform .15s ease;
+}
+.song:hover  { background: rgba(66, 68, 80, .98); transform: scale(1.02); }
+.song.active { background: #c4202b; }
+.song.active::before { content: "♪ "; }
+
+/* phone */
+/* ============ PLAYLIST BUTTON (phone only) ============ */
+#plToggle { display: none; }
+
+@keyframes btnPop { to { opacity: 1; transform: scale(1); } }
+
+@keyframes plInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 640px) {
+  /* panel: bottom-right, above the player, list opens upward */
+  html body.go #playlist#playlist {
+    top: auto !important;
+    height: auto !important;
+    max-height: 20vh !important;
+    bottom: calc(3% + 102px) !important;
+    right: 12px !important;
+    width: min(50vw, 270px) !important;
+    padding: 8px !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    background: rgba(255, 255, 255, .96) !important;
+    z-index: 30 !important;
+    pointer-events: auto !important;
+    transform-origin: bottom right;
+    animation: plInUp .8s ease 3.4s both !important;
+  }
+  html body .pl-head { padding: 8px 10px !important; font-size: 12px !important; }
+  html body .pl-head::after { display: inline-block !important; }
+  html body .pl-list { margin-top: 0 !important; margin-bottom: 8px !important; }
+
+  /* open */
+  html body #playlist:not(.collapsed) .pl-list { max-height: 34vh !important; }
+
+  /* folded: only a small dark pill, no white frame */
+  html body.go #playlist.collapsed {
+    width: 112px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html body #playlist.collapsed .pl-head {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .4);
+  }
+  html body #playlist.collapsed .pl-head::after {
+    transform: rotate(180deg) !important;   /* arrow points up = opens upward */
+  }
+  html body #playlist.collapsed .pl-list {
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+
+/* ============ PLAYLIST ON PHONE: the "playlist" bar is the button ============ */
+@keyframes plInPhone {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 640px) {
+  html body.go #playlist {
+    top: 12px !important;
+    right: 12px !important;
+    width: min(40vw, 250px) !important;
+    padding: 8px !important;
+    background: rgba(255, 255, 255, .96) !important;
+    z-index: 30 !important;
+    pointer-events: auto !important;
+    transform-origin: top right;
+    animation: plInPhone .8s ease 3.4s both !important;
+  }
+  html body .pl-list   { max-height: 36vh !important; }
+  html body .pl-head   { padding: 8px 10px !important; }
+  html body .pl-head::after { display: inline-block !important; }
+}
+
+/* ============ TABLETS (641px - 1024px) ============ */
+@media (min-width: 641px) and (max-width: 1024px) {
+  #title    { top: 8%; }
+  #dateLine { top: calc(8% + clamp(80px, 9vw, 140px)); }
+  #sidebar  { top: 24%; left: 4%;}
+  #sidebar {width: 40%; height:30%;}
+  #playlist { top: 24%; width: clamp(170px, 22vw, 240px); }
+  #theme-panel { top: 24%; right: 4%; }
+  .bubbles  { width: clamp(170px, 24vw, 260px); }
+}
+
+/* ============ BIG TABLETS IN PORTRAIT (iPad Pro) ============ */
+@media (min-width: 1000px) and (orientation: portrait) {
+  :root { --ic: clamp(52px, 5.4vw, 72px); }
+
+  #title    { top: 7%; }
+  #dateLine { top: calc(7% + clamp(120px, 12vw, 190px)); font-size: clamp(16px, 1.8vw, 24px); }
+  #sidebar  { top: 24%; gap: 22px; }
+  #sidebar {width: 40%; height:30%;}
+  #playlist { top: 24%; width: clamp(240px, 24vw, 330px); }
+  #theme-panel { top: 24%; right: 4%; height: 30px;}
+  .bubbles  { width: clamp(220px, 26vw, 340px); }
+  .bubble   { font-size: clamp(15px, 1.6vw, 20px); }
+  .song     { font-size: clamp(13px, 1.4vw, 18px); }
+  .pl-head  { font-size: clamp(14px, 1.5vw, 19px); }
+}
+
+
+#volWrap {
+  position: absolute;
+  right: clamp(10px, 1.6vw, 20px);
+  bottom: clamp(10px, 1.6vw, 20px);
+  top: 55%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: clamp(5px, .8vw, 10px) clamp(16px, 2vw, 26px);
+}
+
+#volBtn {
+  position: relative;
+  flex: none;
+  width: clamp(20px, 1.8vw, 26px);
+  height: clamp(20px, 1.8vw, 26px);
+  border: 0;
+  background: none;
+  color: #111;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+#volBtn svg {
+  width: 100%; height: 100%;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+#volSlider {
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+  accent-color: #c4202b;
+  transition: width .25s ease, opacity .2s ease;
+}
+#volWrap:hover #volSlider,
+#volWrap:focus-within #volSlider {
+  width: clamp(60px, 7vw, 90px);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 640px) {
+  #volWrap:hover #volSlider,
+  #volWrap:focus-within #volSlider {
+    width: 44px;   /* much smaller on phones so it can't overlap other buttons */
+  }
+  #volWrap.open #volSlider {
+    width: 44px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+#dateLine {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  font-family: var(--jp-font);
+  font-weight: 400;
+  font-size: clamp(14px, 1.6vw, 22px);
+  letter-spacing: .25em;
+  color: rgba(255, 255, 255, .85);
+  text-shadow:
+  0 0 6px  rgba(255, 255, 255, .9),
+  0 0 18px rgba(255, 255, 255, .6),
+  0 0 40px rgba(255, 210, 235, .5);
+  opacity: 0;
+  pointer-events: none;
+}
+body.go #dateLine {
+  animation: dateIn 1s ease 2.4s forwards;
+}
+@keyframes dateIn {
+  to { opacity: 1; }
+}
+
+.bubble.sticker {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.bubble.sticker img {
+  display: block;
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  border-radius: 10px;
+  pointer-events: auto;
+}
+
+/* ============ IMAGE LIGHTBOX ============ */
+#lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 10, 14, .55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .3s ease, visibility .3s ease;
+}
+#lightbox.open { 
+  opacity: 1; 
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#lightboxImg {
+  max-width: min(86vw, 520px);
+  max-height: 82vh;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+  transform: scale(.9);
+  transition: transform .3s cubic-bezier(.2, .9, .3, 1.1);
+  cursor: default;
+}
+#lightbox.open #lightboxImg { transform: scale(1); }
+
+/* make the sticker bubble show it's clickable */
+.bubble.sticker img { cursor: pointer; }
+
+/* Add pointer cursor to any image you want to open */
+img.lightbox-trigger {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+img.lightbox-trigger:hover {
+  opacity: 0.9; /* Slight hover effect like Carrd */
+}
+
+
+/* ============ REFINED SNAPPED UNDER-PLAYER THEME BAR ============ */
+.theme-panel {
+  position: fixed;
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: rgba(17, 17, 17, 0.521); 
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%; 
+  padding: 0 14px;
+  overflow: hidden;
+  height: 27px;
+  opacity: 0;
+  transform: translateY(30px);
+
+}
+
+/* Ensure entry delay timing mirrors player card arrival animation layers */
+body.go .theme-panel {
+  animation: themeIn .9s cubic-bezier(.2, .8, .2, 1) 3s forwards;
+}
+@keyframes themeIn { to { opacity: 1; transform: none; } }
+
+/* Clicking trigger target heading text label string styles */
+.theme-head {
+  background: none;
+  border: 0;
+  color: #ffffff; 
+  cursor: pointer;
+  font-family: var(--jp-font);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  padding: 0 6px 0 15px;
+  height: 100%;
+  flex-shrink: 0; /* Prevents the text button from shrinking */
+}
+
+.theme-head::after {
+  content: "▸";
+  display: inline-block;
+  margin-left: 6px;
+  margin-top: 3px;
+  font-size: 8px;
+  color: #ffffff;
+  transition: transform 0.3s ease;
+}
+.theme-head[aria-expanded="true"]::after {
+  transform: rotate(90deg); 
+}
+
+/* Horizontal options frame wrapper module tracking */
+.theme-list {
+  display: flex;
+  gap: 8px;
+  margin-left: 16px;
+  opacity: 1;
+  visibility: visible;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease, visibility 0.25s ease;
+  transform: translateX(0);
+}
+
+/* 🌟 COLLAPSED STATE FIX: The panel layout doesn't change size anymore, only the list text hides */
+.theme-panel.collapsed .theme-list {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-15px); /* Only the text text options slide away smoothly inside */
+}
+
+
+/* Update your CSS selector name to match your HTML id */
+#themeOptions {
+  display: flex;
+  gap: 8px;
+  opacity: 1;
+  visibility: visible;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease, visibility 0.25s ease;
+  transform: translateX(0);
+}
+
+/* Slides and fades ONLY the text options when parent bar has collapsed class */
+.theme-panel.collapsed #themeOptions {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-15px);
+}
+
+
+/* Individual modern inline menu pill option buttons */
+.theme-btn {
+  background: none;
+  border: 0;
+  color: rgba(255, 252, 252, 0.5); 
+  padding: 0 4px;
+  font-family: var(--jp-font);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.theme-btn:hover {
+  color: #faf6f6;
+}
+.theme-btn.active {
+  color: #c4202b; 
+  font-weight: bold;
+}
+
+/* Smartphone responsive overlay alignment math overrides */
+@media (max-width: 640px) {
+  .theme-panel {
+    width: 100% !important;
+    max-width: 92vw !important;
+  }
+}
+
+/* ============ PASSCODE SCREEN ============ */
+#pinScreen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  color: #fff;
+  font-family: var(--jp-font);
+}
+#pinScreen.show { display: flex; }
+
+#pinLabel {
+  font-size: 16px;
+  letter-spacing: .15em;
+  opacity: .85;
+}
+
+#pinBoxes {
+  display: flex;
+  gap: 14px;
+}
+.pin-box {
+  width: 42px;
+  height: 52px;
+  border: 2px solid rgba(255, 255, 255, .6);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  background: rgba(255, 255, 255, .06);
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.pin-box.filled {
+  border-color: #fff;
+  background: rgba(255, 255, 255, .15);
+}
+.pin-box.filled::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+#pinBoxes.shake {
+  animation: pinShake .4s ease;
+}
+@keyframes pinShake {
+  0%, 100% { transform: translateX(0); }
+  20%  { transform: translateX(-8px); }
+  40%  { transform: translateX(8px); }
+  60%  { transform: translateX(-6px); }
+  80%  { transform: translateX(6px); }
+}
+#pinBoxes.shake .pin-box {
+  border-color: #ed4245;
+}
+
+/* the real input is invisible but still works and shows the number keyboard on phones */
+#pinInput {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* blinking cursor in the next empty box */
+.pin-box.current::before {
+  content: "";
+  width: 2px;
+  height: 22px;
+  background: #fff;
+  animation: pinBlink 1s steps(1) infinite;
+}
+@keyframes pinBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* hide the dot and cursor at the same time cleanly */
+.pin-box.filled::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+.pin-box.current.filled::before { display: none; }

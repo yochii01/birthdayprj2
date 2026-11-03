@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Happy Birthday</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Bars -->
+  <div class="bar top"></div>
+  <div class="bar bottom"></div>
+
+
+  <!-- Background photo (rises up, 73% opacity) -->
+  <div id="bg"></div>
+  <div id="shade"></div>
+  <div id="grain"></div>
+
+  <!-- Snow -->
+  <canvas id="snow"></canvas>
+
+  <!-- Animated title (letters are created by script.js) -->
+  <h1 id="title" aria-label="Happy Birthday"></h1>
+  <p id="dateLine"></p>
+
+  <!-- Spotify-style player -->
+  <section id="player">
+    <div id="cd" aria-hidden="true">
+      <div class="cd-label"><span class="cd-hole"></span></div>
+    </div>
+
+    <div class="info">
+      <p id="trackTitle">Loading...</p>
+
+      <div id="controls">
+
+        <div id="seekBar">
+        <div id="progress"></div>
+        </div>
+
+      <div id="btnBox">
+        <button id="shuffle" aria-label="Shuffle">
+          <svg viewBox="0 0 24 24"><path d="M3 7h3.5c1.6 0 3 .8 3.9 2.1l3.2 4.8c.9 1.3 2.3 2.1 3.9 2.1H20M3 17h3.5c1.6 0 3-.8 3.9-2.1M13.6 9.1c.9-1.3 2.3-2.1 3.9-2.1H20M17.5 4 20.5 7l-3 3M17.5 14l3 3-3 3"/></svg>
+        </button>
+
+        <button id="prev" aria-label="Previous">
+          <svg viewBox="0 0 24 24" class="fill"><path d="M6 5h2.2v14H6zM19 5v14L9.5 12z"/></svg>
+        </button>
+
+        <button id="play" aria-label="Play / Pause">
+          <svg id="iconPlay" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path class="fillpath" d="M10 8l6 4-6 4z"/></svg>
+          <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="9.5"/><path class="fillpath" d="M9.5 8.5h1.8v7H9.5zM12.8 8.5h1.8v7h-1.8z"/></svg>
+        </button>
+
+        <button id="next" aria-label="Next">
+          <svg viewBox="0 0 24 24" class="fill"><path d="M16 5h2.2v14H16zM5 5v14l9.5-7z"/></svg>
+        </button>
+
+        <button id="repeat" aria-label="Repeat">
+          <svg viewBox="0 0 24 24"><path d="M4 11V9a3 3 0 0 1 3-3h11M15 3l3 3-3 3M20 13v2a3 3 0 0 1-3 3H6M9 21l-3-3 3-3"/></svg>
+        </button>
+      </div>
+      <div id="volWrap">
+        <input type="range" id="volSlider" min="0" max="100" value="80" aria-label="Volume">
+        <button id="volBtn" aria-label="Mute">
+        <svg id="volOn" viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9z"/><path d="M16 8a5 5 0 0 1 0 8M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+        <svg id="volMute" viewBox="0 0 24 24" style="display:none"><path d="M4 9v6h4l5 5V4L8 9z"/><path d="M16 9l5 5M21 9l-5 5"/></svg>
+        </button>
+      </div>     
+      </div>
+    </div>
+  </section>
+  
+      <div id="themeBar" class="theme-panel collapsed">
+    <button id="themeHead" class="theme-head" aria-expanded="false">Theme</button>
+    <div id="themeList" class="theme-list"></div>
+    <div id="themeOptions" aria-label="Playlist" aria-expanded="false">
+      <button class="theme-btn active" data-theme="snow">Snow</button>
+      <button class="theme-btn" data-theme="fall">Fall</button>
+      <button class="theme-btn" data-theme="spring">Spring</button>
+    </div>
+  </div>
+
+  <nav id="sidebar" aria-label="Messages"></nav>
+
+  <aside id="playlist">
+  <button id="plHead" class="pl-head" aria-expanded="true">playlist</button>
+  <div id="plList" class="pl-list"></div>
+  <button id="plToggle" aria-label="Playlist" aria-expanded="false">
+  <svg viewBox="0 0 24 24"><path d="M4 7h10M4 12h10M4 17h6"/><path d="M18 17V6l4-1"/><circle cx="16" cy="17" r="2"/></svg>
+  </button>
+  </aside>
+
+  <!-- Start screen (browsers block sound until the person taps once) -->
+  <div id="gate">
+    <button id="startBtn">
+      <span class="gift"><img src="images/gift-box2.png"></span>
+      <span>Tap to open</span>
+    </button>
+
+    <div id="pinScreen">
+    <p id="pinLabel">Enter the code</p>
+    <div id="pinBoxes">
+      <span class="pin-box"></span>
+      <span class="pin-box"></span>
+      <span class="pin-box"></span>
+      <span class="pin-box"></span>
+    </div>
+    <input id="pinInput" type="tel" inputmode="numeric" maxlength="4" autocomplete="off">
+  </div>
+  </div>
+
+  <audio id="audio" preload="auto"></audio>
+
+  <script src="js/script.js"></script>
+
+<div id="lightbox">
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+
+</body>
+</html>
