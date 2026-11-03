@@ -356,6 +356,7 @@ body.go #player {
   #title { top: 14%; font-size: clamp(54px, 17vw, 100px); }
   #title .word { display: block; margin: 0; }
   #dateLine { top: calc(14% + 190px); font-size: clamp(13px, 3.2vw, 18px); }
+  #btnBox { justify-content : center; }
 }
 
 /* ===== CINEMATIC BARS ===== */
@@ -674,7 +675,7 @@ body.go #playlist {
     height: auto !important;
     max-height: 20vh !important;
     bottom: calc(3% + 102px) !important;
-    right: 12px !important;
+    right: 17px !important;
     width: min(50vw, 270px) !important;
     padding: 8px !important;
     display: flex !important;
@@ -739,6 +740,7 @@ body.go #playlist {
   html body .pl-list   { max-height: 36vh !important; }
   html body .pl-head   { padding: 8px 10px !important; }
   html body .pl-head::after { display: inline-block !important; }
+
 }
 
 /* ============ TABLETS (641px - 1024px) ============ */
@@ -1034,7 +1036,6 @@ body.go .theme-panel {
 @media (max-width: 640px) {
   .theme-panel {
     width: 100% !important;
-    max-width: 92vw !important;
   }
 }
 
