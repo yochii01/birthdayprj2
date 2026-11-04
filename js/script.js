@@ -389,7 +389,7 @@ const friends = [
     name: "Me",
     messages: [
       "Happy birthday, Irvann (●'◡'●)",
-      "aku buat web ini dan temen-temen juga ikut membantu",
+      "aku buat web ini dan teman2 juga ikut membantu",
       "semoga kamu suka yaa",
     ]
   },
