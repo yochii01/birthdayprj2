@@ -1,4 +1,4 @@
-# 🎂 Happy Birthday Website
+# Birthday Website
 
 A small birthday website made with plain HTML, CSS, and JavaScript.
 
